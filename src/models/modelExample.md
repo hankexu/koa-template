@@ -1,3 +1,5 @@
+#### Model Example
+```
 import MysqlModel from '../core/mysqlModel'
 
 export default class UserModel extends MysqlModel {
@@ -7,3 +9,4 @@ export default class UserModel extends MysqlModel {
   }
 
 }
+```
