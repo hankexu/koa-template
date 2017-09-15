@@ -1,0 +1,23 @@
+{
+  "name": "koa",
+  "script": "./server.js",
+  "exec_mode": "fork", //"fork" or "cluster"
+  "instances": "1",
+  "watch": true,
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "env_production": {
+    "NODE_ENV": "production"
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z",
+  "out_file": "./logs/pm2-out.log",
+  "error_file": "./logs/pm2-err.log",
+  "pid_file": "./logs/jackblog-api-koa.pid",
+  "ignoreWatch": [
+    "[\\/\\\\]\\./",
+    "node_modules",
+    "logs",
+    "*.log"
+  ]
+}
