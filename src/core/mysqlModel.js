@@ -18,7 +18,6 @@ export default class MysqlModel {
   constructor(...schemes) {
     //Sequelize实例
     this.db = globalDB.getInstance()
-
     //Sequelize模型，可包含多个
     this.models = {}
     this.options = {
@@ -28,7 +27,8 @@ export default class MysqlModel {
       offset: 0,
       order: [],
       group: null,
-      having: null
+      having: null,
+      paranoid: true
     }
 
     schemes.forEach((item) => {
@@ -38,7 +38,57 @@ export default class MysqlModel {
 
   }
 
-  reset() {
+  get(modelName = null) {
+    this._switchModel(modelName)
+    this._commit()
+    return this.currentModel.findAll(this.options)
+  }
+
+  getDeleted(modelName = null) {
+    this.options.paranoid = false
+    return this.get(modelName)
+  }
+
+  count(modelName = null) {
+    this._switchModel(modelName)
+    this._commit()
+    return this.currentModel.count(this.options)
+  }
+
+  getOne(modelName) {
+    this._switchModel(modelName)
+    this._commit()
+    return this.currentModel.findOne(this.options)
+  }
+
+  create(modelName, data, fields = null) {
+    this._switchModel(modelName)
+    this._commit()
+    return this.currentModel.create(data, this.options)
+  }
+
+  update(modelName, data) {
+    this._switchModel(modelName)
+    this._commit()
+    return this.currentModel.update(data, this.options)
+  }
+
+
+  delete(modelName, force = false) {
+    this._switchModel(modelName)
+    this._commit()
+    return this.currentModel.destroy(this.options, {force: force})
+  }
+
+  _commit() {
+    for (const key in this.options) {
+      if (this.options[key] == null) {
+        Reflect.deleteProperty(this.options, key)
+      }
+    }
+  }
+
+  _reset() {
     this.options = {
       attributes: null,
       where: {},
@@ -66,26 +116,6 @@ export default class MysqlModel {
     }
   }
 
-  get(modelName = null) {
-    this._switchModel(modelName)
-    this.commit()
-    return this.currentModel.findAll(this.options)
-  }
-
-  commit(){
-    for (const key in this.options){
-      if(this.options[key]==null){
-        Reflect.deleteProperty(this.options,key)
-      }
-    }
-  }
-
-  count(modelName = null) {
-    this._switchModel(modelName)
-    this.commit()
-    return this.currentModel.count(this.options)
-  }
-
   from(modelName) {
     this._switchModel(modelName)
     return this
@@ -109,8 +139,8 @@ export default class MysqlModel {
     return this
   }
 
-  order(field,regular='DESC'){
-    this.options.order.push([field,regular])
+  order(field, regular = 'DESC') {
+    this.options.order.push([field, regular])
     return this
   }
 
@@ -123,10 +153,6 @@ export default class MysqlModel {
     this.options.limit = Number(value)
     this.options.offset = Number(offset)
     return this
-  }
-
-  findOne(modelName) {
-
   }
 }
 
